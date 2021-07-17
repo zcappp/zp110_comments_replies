@@ -1,0 +1,102 @@
+module.exports=`
+
+/**/
+.zp110 .pmeta {
+    font-size: 0.9em;
+    color: rgba(0, 0, 0, 0.3);
+}
+
+.zp110 .zsvg {
+    margin: 0 4px 0 15px;
+    cursor: pointer;
+}
+
+.zp110 .active > .zsvg,
+.zp110 .zsvg:hover {
+    color: rgb(9, 187, 7);
+}
+
+.zp110 .zp100 {
+    margin-top: 15px;
+}
+
+.zp110 .zbtn {
+    margin: 9px 9px 9px 0px;
+}
+
+.zp110 .pavatar {
+    width: 30px;
+    top: 20px;
+    left: 0px;
+    border-radius: 2px;
+    position: absolute;
+}
+
+.zp110 .preplies .pavatar {
+    width: 24px;
+    top: 15px;
+}
+
+.zp110 ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.zp110 li {
+    position: relative;
+    padding: 21px 0px 24px 50px;
+}
+
+.zp110 li:not(:last-child)::after {
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    display: block;
+    content: " ";
+    position: absolute;
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.1);
+    transform: scaleY(0.5);
+    transform-origin: 0px 0px;
+}
+
+.zp110 .preplies li {
+    padding: 12px 0px 5px 34px;
+}
+
+.zp110 .preplies {
+    position: relative;
+    font-size: 0.9em;
+    margin-top: 15px;
+    padding: 1px 12px;
+    border-radius: 2px;
+    background-color: rgb(250, 250, 250);
+}
+
+.zp110 .zright.zbtn {
+    margin-left: 50px;
+}
+
+.zp110 .preplies::before {
+    position: absolute;
+    top: 0px;
+    margin-top: -18px;
+    left: 16px;
+    content: " ";
+    display: block;
+    width: 0px;
+    height: 0px;
+    border-width: 9px;
+    border-style: solid;
+    border-color: transparent transparent rgb(247, 247, 247);
+    border-image: initial;
+}
+
+.zp110 .zsvg_doubleright {
+    transform: rotate(90deg);
+}
+
+
+
+`
