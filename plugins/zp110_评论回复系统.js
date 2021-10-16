@@ -34,7 +34,7 @@ function rCmt(ref, o) {
         <div className="pmeta">
             <span>{exc(`timeago(date("${o._id}"))`)}</span>
             <div className="zright">
-                <span onClick={() => exc(`stopIf(${ref.like.includes(o._id)}, 'warn("不能重复点赞")'); $product.modify("${o._id}", json('{"$inc": {"y.like": 1}}'))`, null, () => {ref.like.push(o._id); exc(`localStorage("zp110", v)`, {v: ref.like}); ref.render()})} className={"pmeta" + (ref.like.includes(o._id) ? " active" : "")}>{EL.like}{o.y.like || 0}</span>
+                <span onClick={() => exc(`stopIf(${ref.like.includes(o._id)}, 'warn("不能重复点赞")'); $product.modify("${o._id}", {$inc: {"y.like": 1}})`, null, () => {ref.like.push(o._id); exc(`localStorage("zp110", v)`, {v: ref.like}); ref.render()})} className={"pmeta" + (ref.like.includes(o._id) ? " active" : "")}>{EL.like}{o.y.like || 0}</span>
                 <span onClick={() => {ref.F = { newReply: o._id }; render()}} className="pmeta">{EL.replyCnt}{o.replyCnt}</span>
                 {ref.user && (ref.user._id === o.auth || ref.user.role.includes(admin)) && <span onClick={() => {ref.F = {cmt: o._id}; render()}} className="pmeta">{EL.edit}</span>}
             </div>
