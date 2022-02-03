@@ -6,7 +6,7 @@ function render(ref) {
     if (!R) return <React.Fragment/>
     return <React.Fragment>
         <div>{R.count} 个评论
-            {!F.start && !R.count && <button onClick={() => {ref.F={start: 1}; ref.render()}} className="zbtn zright">评论</button>}
+            {!F.start && !R.count && <button onClick={() => {ref.F={start: 1}; ref.render()}} className="zbtn zfright">评论</button>}
         </div>
         {F.start && rNewCmt(ref)}
         <ul>{R.arr.map(o => <li key={o._id}>
@@ -14,8 +14,8 @@ function render(ref) {
             {rCmt(ref, o)}
             {(o.replyCnt || F.newReply === o._id) && rReply(ref, o)}
         </li>)}</ul>
-        {R.count > R.arr.length && <span onClick={() => moreCmt(ref)} className="pmeta zright">{EL.more}</span>}
-        {!F.start && !!R.count && <button onClick={() => {ref.F={start: 1}; ref.render(); setTimeout(() => {$(".zp110 .zp100").scrollIntoView(); scrollBy(0, -100)}, 9)}} className="zbtn zright">评论</button>}
+        {R.count > R.arr.length && <span onClick={() => moreCmt(ref)} className="pmeta zfright">{EL.more}</span>}
+        {!F.start && !!R.count && <button onClick={() => {ref.F={start: 1}; ref.render(); setTimeout(() => {$(".zp110 .zp100").scrollIntoView(); scrollBy(0, -100)}, 9)}} className="zbtn zfright">评论</button>}
     </React.Fragment>
 }
 
@@ -33,7 +33,7 @@ function rCmt(ref, o) {
         <div className="zarticle" dangerouslySetInnerHTML={{ __html: o.x.rt }}/>
         <div className="pmeta">
             <span>{exc(`timeago(date("${o._id}"))`)}</span>
-            <div className="zright">
+            <div className="zfright">
                 <span onClick={() => exc(`stopIf(${ref.like.includes(o._id)}, 'warn("不能重复点赞")'); $product.modify("${o._id}", {$inc: {"y.like": 1}})`, null, () => {ref.like.push(o._id); exc(`localStorage("zp110", v)`, {v: ref.like}); ref.render()})} className={"pmeta" + (ref.like.includes(o._id) ? " active" : "")}>{EL.like}{o.y.like || 0}</span>
                 <span onClick={() => {ref.F = { newReply: o._id }; render()}} className="pmeta">{EL.replyCnt}{o.replyCnt}</span>
                 {ref.user && (ref.user._id === o.auth || ref.user.role.includes(admin)) && <span onClick={() => {ref.F = {cmt: o._id}; render()}} className="pmeta">{EL.edit}</span>}
@@ -53,8 +53,8 @@ function rReply(ref, o) {
     return <div className="preplies">
         <ul>{o.reply.map(r => <li key={r.k}>
             {rUser(exc, r.auth, ref)}
-            <span className="zright pmeta">{exc(`timeago(date(${r.d}))`)}</span>
-            {F.reply !== r.k && ref.user && (ref.user._id === r.auth || ref.user.role.includes(admin)) && <span onClick={() => {ref.F = {reply: r.k}; render()}} className="zright pmeta">{EL.edit}</span>}
+            <span className="zfright pmeta">{exc(`timeago(date(${r.d}))`)}</span>
+            {F.reply !== r.k && ref.user && (ref.user._id === r.auth || ref.user.role.includes(admin)) && <span onClick={() => {ref.F = {reply: r.k}; render()}} className="zfright pmeta">{EL.edit}</span>}
             {F.reply !== r.k ? <div className="zarticle" dangerouslySetInnerHTML={{ __html: r.rt }}/> : <div>
                 {render({ t: "Plugin", p: { ID: "zp100", P: { html: r.rt } } }, ref.id + "_2")}
                 <button onClick={() => {ref.F = {}; render()}} className="zbtn">取消</button>
@@ -66,8 +66,8 @@ function rReply(ref, o) {
             {EL.write}
             <button onClick={() => {ref.F = {}; render()}} className="zbtn">取消</button>
             <button onClick={() => newReply(ref, o)} className="zbtn zprimary">回复</button>
-        </div> : <span onClick={() => {ref.F = { newReply: o._id }; render()}} className="zright pmeta">{EL.reply}</span>}
-        {!!o.replyM.length && <span onClick={() => {o.reply = o.reply.concat(o.replyM.splice(0, 5)); render()}} className="pmeta zright">{EL.more}</span>}
+        </div> : <span onClick={() => {ref.F = { newReply: o._id }; render()}} className="zfright pmeta">{EL.reply}</span>}
+        {!!o.replyM.length && <span onClick={() => {o.reply = o.reply.concat(o.replyM.splice(0, 5)); render()}} className="pmeta zfright">{EL.more}</span>}
     </div>
 }
 
@@ -75,7 +75,7 @@ function rUser(exc, auth, ref) {
     let o = exc(`$c.user["${auth}"]`) || {}
     if (!o.x) o.x = {}
     let img = exc(`get(o, path)`, {o, path: ref.avatar}) || (o.wx ? o.wx.headimgurl : avatar) || avatar
-    let name = exc(`get(o, path)`, {o, path: ref.username}) || (o.wx ? o.wx.nickname : "无名氏") || "无名氏"
+    let name = exc(`get(o, path)`, {o, path: ref.username}) || (o.wx ? o.wx.nickname : "无名") || "无名"
     return <a href={ref.userpage ? exc(ref.userpage, o) : ""} target="_blank"><img className="pavatar" src={img}/><span>{name}</span></a>
 }
 
