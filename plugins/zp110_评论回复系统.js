@@ -96,9 +96,10 @@ function onInit(ref) {
     getCmt(ref, R => {
         ref.user = exc('$c.me')
         ref.times = 0
+        ref.pgid = exc('$pg') + exc('$id')
         ref.timer = setInterval(() => {
             ref.times += 1
-            if (ref.times > 20) clearInterval(ref.timer)
+            if (ref.times > 20 || ref.pgid != exc('$pg') + exc('$id')) clearInterval(ref.timer)
             getLatest(ref)
         }, 60000)
     })
