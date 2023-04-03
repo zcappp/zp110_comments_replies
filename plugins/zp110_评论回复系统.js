@@ -79,7 +79,7 @@ function rUser(exc, auth, ref) {
     return <a href={ref.userpage ? exc(ref.userpage, o) : ""} target="_blank"><img className="pavatar" src={img}/><span>{name}</span></a>
 }
 
-function onInit(ref) {
+function init(ref) {
     const { exc, render } = ref
     ref.F = {}
     ref.pid = ref.props.pid || exc('$id')
@@ -106,7 +106,7 @@ function onInit(ref) {
     ref.like = exc('localStorage("zp110")') || []
 }
 
-function onDestroy(ref) {
+function destroy(ref) {
     clearInterval(ref.timer)
 }
 
@@ -291,8 +291,8 @@ $plugin({
         label: "使用自定义接口服务 ($api.service)"
     }],
     render,
-    onInit,
-    onDestroy,
+    init,
+    destroy,
     css
 })
 
