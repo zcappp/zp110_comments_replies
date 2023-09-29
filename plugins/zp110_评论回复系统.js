@@ -180,7 +180,7 @@ function newCmt(ref) {
     const rt = $(".zp110 .zp100").getHTML()
     if (!rt) return exc('warn("请填写评论内容")')
     const _id = ref.pid
-    const exp = ref.props.api ? '$api.service("zp110_new", x)' : '$product.create("zp110", x); $product.modify(_id, O)'
+    const exp = ref.props.api ? '$srv.zp110_new(x)' : '$product.create("zp110", x); $product.modify(_id, O)'
     exc(exp, { _id, x: { rt, zp110: _id }, O: { "$inc": { "y.cmt": 1 } } }, r => {
         if (!r) return warn("出错了")
         ref.F = {}
@@ -193,7 +193,7 @@ function newCmt(ref) {
 function delCmt(ref) {
     const { exc } = ref
     const _id = ref.F.cmt
-    const exp = 'confirm("确定要删除吗?"); ' + (ref.props.api ? '$api.service("zp110_del", X)' : '$product.modify(zp110, O); $product.delete(_id)')
+    const exp = 'confirm("确定要删除吗?"); ' + (ref.props.api ? '$srv.zp110_del(X)' : '$product.modify(zp110, O); $product.delete(_id)')
     return exc(exp, { _id, X: { _id, zp110: ref.pid }, zp110: ref.pid, O: { "$inc": { "y.cmt": -1 } } }, r => {
         if (!r) return warn("出错了")
         const idx = ref.R.arr.findIndex(a => _id === a._id)
@@ -288,7 +288,7 @@ $plugin({
     }, {
         prop: "api",
         type: "switch",
-        label: "使用自定义接口服务 ($api.service)"
+        label: "使用自定义后端服务"
     }],
     render,
     init,
