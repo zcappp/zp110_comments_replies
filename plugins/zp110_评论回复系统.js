@@ -1,109 +1,113 @@
 import React from "react"
 import css from "../css/zp110_评论回复系统.css"
 
+let exc, excA, rd
+
+function init(ref) {
+    exc = ref.exc
+    excA = ref.excA
+    rd = ref.render
+    ref.F = {}
+    ref.pid = ref.props.pid || excA('$id')
+    ref.admin = ref.props.admin || "admin"
+    ref.userpage = ref.props.userpage
+    ref.username = ref.props.username || "x.姓名"
+    ref.avatar = ref.props.avatar || "x.头像"
+    if (!ref.pid) return exc('warn("请给插件zp110传入帖子_id")')
+    EL.write = rd({ t: "Plugin", p: { ID: "zp100" } }, ref.id + "_0")
+    ref.container.start = () => {
+        ref.F = { start: 1 };
+        rd()
+    }
+    getCmt(ref, R => {
+        ref.user = excA('$c.me')
+        ref.times = 0
+        ref.pgid = excA('$pg') + excA('$id')
+        ref.timer = setInterval(() => {
+            ref.times += 1
+            if (ref.times > 20 || ref.pgid != excA('$pg') + excA('$id')) clearInterval(ref.timer)
+            getLatest(ref)
+        }, 60000)
+    })
+    ref.like = excA('localStorage("zp110")') || []
+}
+
 function render(ref) {
-    const { exc, R, F } = ref
+    const { R, F } = ref
     if (!R) return <React.Fragment/>
     return <React.Fragment>
         <div>{R.count} 个评论
-            {!F.start && !R.count && <button onClick={() => {ref.F={start: 1}; ref.render()}} className="zbtn zfright">评论</button>}
+            {!F.start && !R.count && <button onClick={() => {ref.F={start: 1}; rd()}} className="zbtn zfright">评论</button>}
         </div>
         {F.start && rNewCmt(ref)}
         <ul>{R.arr.map(o => <li key={o._id}>
-            {rUser(exc, o.auth, ref)}
+            {rUser(o.auth, ref)}
             {rCmt(ref, o)}
             {(o.replyCnt || F.newReply === o._id) && rReply(ref, o)}
         </li>)}</ul>
         {R.count > R.arr.length && <span onClick={() => moreCmt(ref)} className="pmeta zfright">{EL.more}</span>}
-        {!F.start && !!R.count && <button onClick={() => {ref.F={start: 1}; ref.render(); setTimeout(() => {$(".zp110 .zp100").scrollIntoView(); scrollBy(0, -100)}, 9)}} className="zbtn zfright">评论</button>}
+        {!F.start && !!R.count && <button onClick={() => {ref.F={start: 1}; rd(); setTimeout(() => {$(".zp110 .zp100").scrollIntoView(); scrollBy(0, -100)}, 9)}} className="zbtn zfright">评论</button>}
     </React.Fragment>
 }
 
 function rNewCmt(ref) {
     return <div>
         {EL.write}
-        <button onClick={() => {ref.F = {}; ref.render()}} className="zbtn">取消</button>
+        <button onClick={() => {ref.F = {}; rd()}} className="zbtn">取消</button>
         <button onClick={() => newCmt(ref)} className="zbtn zprimary">发表</button>
     </div>
 }
 
 function rCmt(ref, o) {
-    const { exc, render, F, admin } = ref
+    const { F, admin } = ref
     if (F.cmt !== o._id) return <div>
         <div className="zarticle" dangerouslySetInnerHTML={{ __html: o.x.rt }}/>
         <div className="pmeta">
-            <span>{exc(`timeago(date("${o._id}"))`)}</span>
+            <span>{excA(`timeago(date("${o._id}"))`)}</span>
             <div className="zfright">
-                <span onClick={() => exc(`stopIf(${ref.like.includes(o._id)}, 'warn("不能重复点赞")'); $product.modify("${o._id}", {$inc: {"y.like": 1}})`, null, () => {ref.like.push(o._id); exc(`localStorage("zp110", v)`, {v: ref.like}); ref.render()})} className={"pmeta" + (ref.like.includes(o._id) ? " active" : "")}>{EL.like}{o.y.like || 0}</span>
-                <span onClick={() => {ref.F = { newReply: o._id }; render()}} className="pmeta">{EL.replyCnt}{o.replyCnt}</span>
-                {ref.user && (ref.user._id === o.auth || ref.user.role.includes(admin)) && <span onClick={() => {ref.F = {cmt: o._id}; render()}} className="pmeta">{EL.edit}</span>}
+                <span onClick={() => exc(`stopIf(${ref.like.includes(o._id)}, 'warn("不能重复点赞")'); $product.modify("${o._id}", {$inc: {"y.like": 1}})`, null, () => {ref.like.push(o._id); exc(`localStorage("zp110", v)`, {v: ref.like}); rd()})} className={"pmeta" + (ref.like.includes(o._id) ? " active" : "")}>{EL.like}{o.y.like || 0}</span>
+                <span onClick={() => {ref.F = { newReply: o._id }; rd()}} className="pmeta">{EL.replyCnt}{o.replyCnt}</span>
+                {ref.user && (ref.user._id === o.auth || ref.user.role.includes(admin)) && <span onClick={() => {ref.F = {cmt: o._id}; rd()}} className="pmeta">{EL.edit}</span>}
             </div>
         </div>
     </div>
     return <div>
-        {render({ t: "Plugin", p: { ID: "zp100", P: { html: o.x.rt } } }, ref.id + "_1")}
-        <button onClick={() => {ref.F = {}; render()}} className="zbtn">取消</button>
+        {rd({ t: "Plugin", p: { ID: "zp100", P: { html: o.x.rt } } }, ref.id + "_1")}
+        <button onClick={() => {ref.F = {}; rd()}} className="zbtn">取消</button>
         <button onClick={() => delCmt(ref)} className="zbtn zdanger">删除</button>
         <button onClick={() => modifyCmt(ref)} className="zbtn zprimary">修改</button>
     </div>
 }
 
 function rReply(ref, o) {
-    const { exc, render, F, admin } = ref
+    const { F, admin } = ref
     return <div className="preplies">
         <ul>{o.reply.map(r => <li key={r.k}>
-            {rUser(exc, r.auth, ref)}
-            <span className="zfright pmeta">{exc(`timeago(date(${r.d}))`)}</span>
-            {F.reply !== r.k && ref.user && (ref.user._id === r.auth || ref.user.role.includes(admin)) && <span onClick={() => {ref.F = {reply: r.k}; render()}} className="zfright pmeta">{EL.edit}</span>}
+            {rUser(r.auth, ref)}
+            <span className="zfright pmeta">{excA(`timeago(date(${r.d}))`)}</span>
+            {F.reply !== r.k && ref.user && (ref.user._id === r.auth || ref.user.role.includes(admin)) && <span onClick={() => {ref.F = {reply: r.k}; rd()}} className="zfright pmeta">{EL.edit}</span>}
             {F.reply !== r.k ? <div className="zarticle" dangerouslySetInnerHTML={{ __html: r.rt }}/> : <div>
-                {render({ t: "Plugin", p: { ID: "zp100", P: { html: r.rt } } }, ref.id + "_2")}
-                <button onClick={() => {ref.F = {}; render()}} className="zbtn">取消</button>
+                {rd({ t: "Plugin", p: { ID: "zp100", P: { html: r.rt } } }, ref.id + "_2")}
+                <button onClick={() => {ref.F = {}; rd()}} className="zbtn">取消</button>
                 <button onClick={() => delReply(ref, o)} className="zbtn zdanger">删除</button>
                 <button onClick={() => modifyReply(ref, o)} className="zbtn zprimary">修改</button>
             </div>}
         </li>)}</ul>
         {F.newReply === o._id ? <div>
             {EL.write}
-            <button onClick={() => {ref.F = {}; render()}} className="zbtn">取消</button>
+            <button onClick={() => {ref.F = {}; rd()}} className="zbtn">取消</button>
             <button onClick={() => newReply(ref, o)} className="zbtn zprimary">回复</button>
-        </div> : <span onClick={() => {ref.F = { newReply: o._id }; render()}} className="zfright pmeta">{EL.reply}</span>}
-        {!!o.replyM.length && <span onClick={() => {o.reply = o.reply.concat(o.replyM.splice(0, 5)); render()}} className="pmeta zfright">{EL.more}</span>}
+        </div> : <span onClick={() => {ref.F = { newReply: o._id }; rd()}} className="zfright pmeta">{EL.reply}</span>}
+        {!!o.replyM.length && <span onClick={() => {o.reply = o.reply.concat(o.replyM.splice(0, 5)); rd()}} className="pmeta zfright">{EL.more}</span>}
     </div>
 }
 
-function rUser(exc, auth, ref) {
-    let o = exc(`$c.user["${auth}"]`) || {}
+function rUser(auth, ref) {
+    let o = excA(`$c.user["${auth}"]`) || {}
     if (!o.x) o.x = {}
-    let img = exc(`get(o, path)`, {o, path: ref.avatar}) || (o.wx ? o.wx.headimgurl : avatar) || avatar
-    let name = exc(`get(o, path)`, {o, path: ref.username}) || (o.wx ? o.wx.nickname : "无名") || "无名"
-    return <a href={ref.userpage ? exc(ref.userpage, o) : ""} target="_blank"><img className="pavatar" src={img}/><span>{name}</span></a>
-}
-
-function init(ref) {
-    const { exc, render } = ref
-    ref.F = {}
-    ref.pid = ref.props.pid || exc('$id')
-    ref.admin = ref.props.admin || "admin"
-    ref.userpage = ref.props.userpage
-    ref.username = ref.props.username || "x.姓名"
-    ref.avatar = ref.props.avatar || "x.头像"
-    if (!ref.pid) return exc('warn("请给插件zp110传入帖子_id")')
-    EL.write = render({ t: "Plugin", p: { ID: "zp100" } }, ref.id + "_0")
-    ref.container.start = () => {
-        ref.F = { start: 1 };
-        render()
-    }
-    getCmt(ref, R => {
-        ref.user = exc('$c.me')
-        ref.times = 0
-        ref.pgid = exc('$pg') + exc('$id')
-        ref.timer = setInterval(() => {
-            ref.times += 1
-            if (ref.times > 20 || ref.pgid != exc('$pg') + exc('$id')) clearInterval(ref.timer)
-            getLatest(ref)
-        }, 60000)
-    })
-    ref.like = exc('localStorage("zp110")') || []
+    let img = excA(`get(o, path)`, { o, path: ref.avatar }) || (o.wx ? o.wx.headimgurl : avatar) || avatar
+    let name = excA(`get(o, path)`, { o, path: ref.username }) || (o.wx ? o.wx.nickname : "无名") || "无名"
+    return <a href={ref.userpage ? excA(ref.userpage, o) : ""} target="_blank"><img className="pavatar" src={img}/><span>{name}</span></a>
 }
 
 function destroy(ref) {
@@ -112,20 +116,20 @@ function destroy(ref) {
 
 function getCmt(ref, cb) {
     const _id = ref.pid
-    ref.exc(`$product.search("zp110." + _id, Q, O, null, 1)`, { _id, Q: { type: "zp110", "x.zp110": _id }, O: { sort: { "_id": -1 }, limit: 10 } }, R => {
+    exc(`$product.search("zp110." + _id, Q, O, null, 1)`, { _id, Q: { type: "zp110", "x.zp110": _id }, O: { sort: { "_id": -1 }, limit: 10 } }, R => {
         if (!R) return warn("出错了")
         cb && cb(R)
         ref.R = R
         if (!R.count) return
         R.arr.forEach(a => transformReply(a))
         getUsers(ref, R.arr)
-        ref.render()
+        rd()
     })
 }
 
 function moreCmt(ref) {
     const _id = ref.pid
-    ref.exc(`$product.search("zp110." + _id, Q, O, null, 1)`, { _id, Q: { type: "zp110", "x.zp110": _id, _id: { $lt: ref.R.arr[ref.R.arr.length - 1]._id } }, O: { sort: { "_id": -1 }, limit: 10 } }, R => {
+    exc(`$product.search("zp110." + _id, Q, O, null, 1)`, { _id, Q: { type: "zp110", "x.zp110": _id, _id: { $lt: ref.R.arr[ref.R.arr.length - 1]._id } }, O: { sort: { "_id": -1 }, limit: 10 } }, R => {
         if (!R || !R.count) {
             ref.R.count = ref.R.arr.length
             return wanr("no more cmt")
@@ -133,21 +137,21 @@ function moreCmt(ref) {
         R.arr.forEach(a => transformReply(a))
         getUsers(ref, R.arr)
         ref.R.arr = ref.R.arr.concat(R.arr)
-        ref.render()
+        rd()
     })
 }
 
 function getLatest(ref) {
     if (!ref.R || !ref.R.count) return getCmt(ref)
     const _id = ref.pid
-    ref.exc(`$product.search("zp110." + _id, Q, O, null, 1)`, { _id, Q: { type: "zp110", "x.zp110": _id, _id: { $gt: ref.R.arr[0]._id } }, O: { limit: 0 } }, R => {
+    exc(`$product.search("zp110." + _id, Q, O, null, 1)`, { _id, Q: { type: "zp110", "x.zp110": _id, _id: { $gt: ref.R.arr[0]._id } }, O: { limit: 0 } }, R => {
         if (!R || !R.count) return
         R.arr.sort((a, b) => a < b ? 1 : -1)
         R.arr.forEach(a => transformReply(a))
         ref.R.arr = R.arr.concat(ref.R.arr)
         ref.R.count += R.count
         getUsers(ref, R.arr)
-        ref.render()
+        rd()
     })
 }
 
@@ -164,7 +168,6 @@ function transformReply(o) {
 }
 
 function getUsers(ref, arr) {
-    const { exc } = ref
     let users = []
     arr.forEach(a => {
         if (!exc(`$c.user["${a.auth}"]`)) users.push(a.auth)
@@ -172,11 +175,10 @@ function getUsers(ref, arr) {
             if (!exc(`$c.user["${a.auth}"]`)) users.push(a.auth)
         })
     })
-    if (users.length) exc(`$user.search("zp110.user", Q, O)`, { Q: { _id: { $in: users.filter((v, i, a) => a.indexOf(v) === i) } }, O: { limit: 0, select: ref.username + " " + ref.avatar + " wx.nickname wx.headimgurl" } }, () => ref.render())
+    if (users.length) exc(`$user.search("zp110.user", Q, O)`, { Q: { _id: { $in: users.filter((v, i, a) => a.indexOf(v) === i) } }, O: { limit: 0, select: ref.username + " " + ref.avatar + " wx.nickname wx.headimgurl" } }, () => rd())
 }
 
 function newCmt(ref) {
-    const { exc } = ref
     const rt = $(".zp110 .zp100").getHTML()
     if (!rt) return exc('warn("请填写评论内容")')
     const _id = ref.pid
@@ -191,7 +193,6 @@ function newCmt(ref) {
 }
 
 function delCmt(ref) {
-    const { exc } = ref
     const _id = ref.F.cmt
     const exp = 'confirm("确定要删除吗?"); ' + (ref.props.api ? '$srv.zp110_del(X)' : '$product.modify(zp110, O); $product.delete(_id)')
     return exc(exp, { _id, X: { _id, zp110: ref.pid }, zp110: ref.pid, O: { "$inc": { "y.cmt": -1 } } }, r => {
@@ -208,14 +209,13 @@ function delCmt(ref) {
 function modifyCmt(ref) {
     const rt = $(".zp110 .zp100").getHTML()
     if (!rt) return exc('warn("请填写评论内容")')
-    ref.exc(`$product.modify("${ref.F.cmt}", O)`, { O: { rt } }, r => {
+    exc(`$product.modify("${ref.F.cmt}", O)`, { O: { rt } }, r => {
         ref.F = {}
-        ref.render()
+        rd()
     })
 }
 
 function newReply(ref, o) {
-    const { exc } = ref
     const rt = $(".zp110 .zp100").getHTML()
     if (!rt) return exc('warn("请填写回复内容")')
     if (!ref.user) return exc('warn("请登录")')
@@ -226,21 +226,21 @@ function newReply(ref, o) {
         ref.F = {}
         transformReply(r)
         Object.assign(o, r)
-        ref.render()
+        rd()
     })
 }
 
 function modifyReply(ref, cmt) {
     const rt = $(".zp110 .zp100").getHTML()
-    if (!rt) return ref.exc('warn("请填写回复内容")')
+    if (!rt) return exc('warn("请填写回复内容")')
     const O = {
         ["x.reply." + ref.F.reply]: rt
     }
-    ref.exc(`$product.modify("${cmt._id}", O)`, { O }, r => {
+    exc(`$product.modify("${cmt._id}", O)`, { O }, r => {
         ref.F = {}
         transformReply(r)
         Object.assign(cmt, r)
-        ref.render()
+        rd()
     })
 }
 
@@ -250,11 +250,11 @@ function delReply(ref, cmt) {
             ["x.reply." + ref.F.reply]: ""
         }
     }
-    ref.exc(`confirm("确定要删除吗?"); $product.modify("${cmt._id}", O)`, { O }, r => {
+    exc(`confirm("确定要删除吗?"); $product.modify("${cmt._id}", O)`, { O }, r => {
         ref.F = {}
         transformReply(r)
         Object.assign(cmt, r)
-        ref.render()
+        rd()
     })
 }
 
