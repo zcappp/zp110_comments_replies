@@ -5,7 +5,7 @@ module.exports = {
     mode: process.env.mode || "development",
     devtool: false,
     entry: {
-        "zp110": "./plugins/zp110_评论回复系统.js",
+        "zp110": "./src/zp110_评论回复系统.js",
     },
     output: {
         path: path.join(__dirname, "build/"),

@@ -1,5 +1,5 @@
 import React from "react"
-import css from "../css/zp110_评论回复系统.css"
+import css from "./zp110_评论回复系统.css"
 
 let exc, excA, rd
 
