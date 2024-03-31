@@ -54,7 +54,7 @@ function rNewCmt(ref) {
     return <div>
         {EL.write}
         <button onClick={() => {ref.F = {}; rd()}} className="zbtn">取消</button>
-        <button onClick={() => newCmt(ref)} className="zbtn zprimary">发表</button>
+        <button onClick={() => newCmt(ref)} className="zbtn main">发表</button>
     </div>
 }
 
@@ -74,8 +74,8 @@ function rCmt(ref, o) {
     return <div>
         {rd({ t: "Plugin", p: { ID: "zp100", P: { html: o.x.rt } } }, ref.id + "_1")}
         <button onClick={() => {ref.F = {}; rd()}} className="zbtn">取消</button>
-        <button onClick={() => delCmt(ref)} className="zbtn zdanger">删除</button>
-        <button onClick={() => modifyCmt(ref)} className="zbtn zprimary">修改</button>
+        <button onClick={() => delCmt(ref)} className="zbtn danger">删除</button>
+        <button onClick={() => modifyCmt(ref)} className="zbtn main">修改</button>
     </div>
 }
 
@@ -89,14 +89,14 @@ function rReply(ref, o) {
             {F.reply !== r.k ? <div className="zarticle" dangerouslySetInnerHTML={{ __html: r.rt }}/> : <div>
                 {rd({ t: "Plugin", p: { ID: "zp100", P: { html: r.rt } } }, ref.id + "_2")}
                 <button onClick={() => {ref.F = {}; rd()}} className="zbtn">取消</button>
-                <button onClick={() => delReply(ref, o)} className="zbtn zdanger">删除</button>
-                <button onClick={() => modifyReply(ref, o)} className="zbtn zprimary">修改</button>
+                <button onClick={() => delReply(ref, o)} className="zbtn danger">删除</button>
+                <button onClick={() => modifyReply(ref, o)} className="zbtn main">修改</button>
             </div>}
         </li>)}</ul>
         {F.newReply === o._id ? <div>
             {EL.write}
             <button onClick={() => {ref.F = {}; rd()}} className="zbtn">取消</button>
-            <button onClick={() => newReply(ref, o)} className="zbtn zprimary">回复</button>
+            <button onClick={() => newReply(ref, o)} className="zbtn main">回复</button>
         </div> : <span onClick={() => {ref.F = { newReply: o._id }; rd()}} className="zfright pmeta">{EL.reply}</span>}
         {!!o.replyM.length && <span onClick={() => {o.reply = o.reply.concat(o.replyM.splice(0, 5)); rd()}} className="pmeta zfright">{EL.more}</span>}
     </div>
