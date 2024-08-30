@@ -13,7 +13,7 @@ function init(ref) {
     ref.userpage = ref.props.userpage
     ref.username = ref.props.username || "x.姓名"
     ref.avatar = ref.props.avatar || "x.头像"
-    if (!ref.pid) return exc('warn("请给插件zp110传入帖子_id")')
+    if (!ref.pid) return ref.isDev ? exc('warn("请给插件zp110传入帖子_id")') : ""
     EL.write = rd({ t: "Plugin", p: { ID: "zp100" } }, ref.id + "_0")
     ref.container.start = () => {
         ref.F = { start: 1 };
